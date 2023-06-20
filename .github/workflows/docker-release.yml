@@ -41,6 +41,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ./op-node/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
 
@@ -77,6 +78,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ./op-batcher/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
   push-op-proposer:
@@ -112,5 +114,6 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
+          file: ./op-proposer/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
