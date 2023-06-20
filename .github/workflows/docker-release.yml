@@ -34,14 +34,14 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+          echo "IMAGE_ID=$IMAGE_ID">>$GITHUB_OUTPUT
+          echo "VERSION=$VERSION">>$GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: $IMAGE_ID:$VERSION
+          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
 
   push-op-batcher:
     runs-on: ubuntu-latest
@@ -69,14 +69,14 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+          echo "IMAGE_ID=$IMAGE_ID">>$GITHUB_OUTPUT
+          echo "VERSION=$VERSION">>$GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: $IMAGE_ID:$VERSION
+          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
   push-op-proposer:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -103,11 +103,11 @@ jobs:
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           # Use Docker `latest` tag convention
           [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
+          echo "IMAGE_ID=$IMAGE_ID">>$GITHUB_OUTPUT
+          echo "VERSION=$VERSION">>$GITHUB_OUTPUT
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: $IMAGE_ID:$VERSION
+          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
