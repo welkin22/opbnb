@@ -18,7 +18,7 @@ jobs:
       - name: Build image
         run: |
           docker build . \
-          -f ./op-node/Dockerfile -t "${IMAGE_NAME}" --label "runnumber=${GITHUB_RUN_ID}"
+          -f ./op-node/Dockerfile -t "op-node" --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
@@ -49,7 +49,7 @@ jobs:
       - name: Build image
         run: |
           docker build . \
-          -f ./op-batcher/Dockerfile -t "${IMAGE_NAME}" --label "runnumber=${GITHUB_RUN_ID}"
+          -f ./op-batcher/Dockerfile -t "op-batcher" --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
@@ -80,7 +80,7 @@ jobs:
       - name: Build image
         run: |
           docker build . \
-          -f ./op-proposer/Dockerfile -t "${IMAGE_NAME}" --label "runnumber=${GITHUB_RUN_ID}"
+          -f ./op-proposer/Dockerfile -t "op-proposer" --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log into registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
