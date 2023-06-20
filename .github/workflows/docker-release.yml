@@ -23,6 +23,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: ImageId
+        id: image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/op-node
 
@@ -41,7 +42,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
+          tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
 
   push-op-batcher:
     runs-on: ubuntu-latest
@@ -58,6 +59,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: ImageId
+        id: image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/op-batcher
 
@@ -76,7 +78,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
+          tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
   push-op-proposer:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -92,6 +94,7 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: ImageId
+        id: image
         run: |
           IMAGE_ID=ghcr.io/${{ github.repository_owner }}/op-proposer
 
@@ -110,4 +113,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.vars.outputs.IMAGE_ID }}:${{ steps.vars.outputs.VERSION }}
+          tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
