@@ -15,6 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up QEMU
+        id: qemu
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -46,6 +47,7 @@ jobs:
           file: ./op-node/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
+          platforms: ${{ steps.qemu.outputs.platforms }}
 
   push-op-batcher:
     runs-on: ubuntu-latest
@@ -54,6 +56,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up QEMU
+        id: qemu
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -85,6 +88,7 @@ jobs:
           file: ./op-batcher/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
+          platforms: ${{ steps.qemu.outputs.platforms }}
   push-op-proposer:
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
@@ -92,6 +96,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up QEMU
+        id: qemu
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -123,3 +128,4 @@ jobs:
           file: ./op-proposer/Dockerfile
           push: true
           tags: ${{ steps.image.outputs.IMAGE_ID }}:${{ steps.image.outputs.VERSION }}
+          platforms: ${{ steps.qemu.outputs.platforms }}
