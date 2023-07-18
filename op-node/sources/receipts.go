@@ -3,9 +3,11 @@ package sources
 import (
 	"context"
 	"fmt"
+	"github.com/ethereum/go-ethereum/log"
 	"io"
 	"math"
 	"sync"
+	"time"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -344,9 +346,10 @@ type receiptsFetchingJob struct {
 
 	result                types.Receipts
 	maxConcurrentRequests int
+	l                     log.Logger
 }
 
-func NewReceiptsFetchingJob(requester ReceiptsRequester, client rpcClient, maxBatchSize int, block eth.BlockID, receiptHash common.Hash, txHashes []common.Hash, maxConcurrentRequests int) *receiptsFetchingJob {
+func NewReceiptsFetchingJob(requester ReceiptsRequester, client rpcClient, maxBatchSize int, block eth.BlockID, receiptHash common.Hash, txHashes []common.Hash, maxConcurrentRequests int, log log.Logger) *receiptsFetchingJob {
 	return &receiptsFetchingJob{
 		requester:             requester,
 		client:                client,
@@ -355,6 +358,7 @@ func NewReceiptsFetchingJob(requester ReceiptsRequester, client rpcClient, maxBa
 		receiptHash:           receiptHash,
 		txHashes:              txHashes,
 		maxConcurrentRequests: maxConcurrentRequests,
+		l:                     log,
 	}
 }
 
@@ -376,6 +380,7 @@ func (job *receiptsFetchingJob) runFetcher(ctx context.Context) error {
 			job.client.BatchCallContext,
 			job.client.CallContext,
 			job.maxBatchSize,
+			job.l,
 		)
 	}
 
@@ -388,15 +393,19 @@ func (job *receiptsFetchingJob) runFetcher(ctx context.Context) error {
 	} else {
 		// otherwise, we can do sequential fetching
 		for {
+			job.l.Debug("Fetching receipts sequential start", "block", job.block.Hash, "txCount", len(job.txHashes))
 			if err := job.fetcher.Fetch(ctx); err == io.EOF {
+				job.l.Debug("Fetching receipts sequential done", "block", job.block.Hash, "txCount", len(job.txHashes))
 				break
 			} else if err != nil {
+				job.l.Error("Fetching receipts sequential err", "block", job.block.Hash, "txCount", len(job.txHashes), "err", err)
 				return err
 			}
 		}
 	}
 
 	result, err := job.fetcher.Result()
+	job.l.Debug("Fetching receipts result", "block", job.block.Hash, "txCount", len(job.txHashes), "err", err, "resultCount", len(result))
 	if err != nil { // errors if results are not available yet, should never happen.
 		return err
 	}
@@ -415,22 +424,28 @@ func (job *receiptsFetchingJob) concurrentFetch(ctx context.Context) error {
 	var wg sync.WaitGroup
 	suggestConcurrent := math.Ceil(float64(len(job.txHashes)) / float64(job.maxBatchSize))
 	concurrentRequests := int(math.Min(suggestConcurrent, float64(job.maxConcurrentRequests)))
+	job.l.Debug("concurrent fetching", "concurrentRequests", concurrentRequests, "block", job.block.Hash)
+	beginTime := time.Now()
 	wg.Add(concurrentRequests)
 	errs := make(chan error, concurrentRequests)
 	for i := 0; i < concurrentRequests; i++ {
-		go func() {
+		go func(th int) {
 			defer wg.Done()
 			for {
+				job.l.Debug("concurrent fetching start", "thread", th, "block", job.block.Hash)
 				if err := job.fetcher.Fetch(ctx); err == io.EOF {
+					job.l.Debug("concurrent fetching done", "thread", th, "block", job.block.Hash)
 					return
 				} else if err != nil {
+					job.l.Error("concurrent fetching err", "thread", th, "block", job.block.Hash, "err", err)
 					errs <- err
 					return
 				}
 			}
-		}()
+		}(i)
 	}
 	wg.Wait()
+	job.l.Debug("concurrent fetching done", "duration", time.Since(beginTime), "block", job.block.Hash)
 	if len(errs) > 0 {
 		if callErr := <-errs; callErr != nil {
 			return callErr

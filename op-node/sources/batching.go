@@ -3,6 +3,7 @@ package sources
 import (
 	"context"
 	"fmt"
+	"github.com/ethereum/go-ethereum/log"
 	"io"
 	"sync"
 	"sync/atomic"
@@ -28,6 +29,7 @@ type IterativeBatchCall[K any, V any] struct {
 
 	requestsValues []V
 	scheduled      chan rpc.BatchElem
+	l              log.Logger
 }
 
 // NewIterativeBatchCall constructs a batch call, fetching the values with the given keys,
@@ -37,7 +39,7 @@ func NewIterativeBatchCall[K any, V any](
 	makeRequest func(K) (V, rpc.BatchElem),
 	getBatch BatchCallContextFn,
 	getSingle CallContextFn,
-	batchSize int) *IterativeBatchCall[K, V] {
+	batchSize int, l log.Logger) *IterativeBatchCall[K, V] {
 
 	if len(requestsKeys) < batchSize {
 		batchSize = len(requestsKeys)
@@ -53,6 +55,7 @@ func NewIterativeBatchCall[K any, V any](
 		requestsKeys: requestsKeys,
 		batchSize:    batchSize,
 		makeRequest:  makeRequest,
+		l:            l,
 	}
 	out.Reset()
 	return out
@@ -86,6 +89,7 @@ func (ibc *IterativeBatchCall[K, V]) Reset() {
 func (ibc *IterativeBatchCall[K, V]) Fetch(ctx context.Context) error {
 	ibc.resetLock.RLock()
 	defer ibc.resetLock.RUnlock()
+	ibc.l.Debug("IterativeBatchCall fetch start", "size", len(ibc.requestsKeys), "batchSize", ibc.batchSize)
 
 	// return early if context is Done
 	if ctx.Err() != nil {
@@ -131,6 +135,7 @@ func (ibc *IterativeBatchCall[K, V]) Fetch(ctx context.Context) error {
 		return nil
 	}
 
+	ibc.l.Debug("IterativeBatchCall fetching batch", "size", len(batch), "batchSize", ibc.batchSize)
 	if ibc.batchSize == 1 {
 		first := batch[0]
 		if err := ibc.getSingle(ctx, &first.Result, first.Method, first.Args...); err != nil {
