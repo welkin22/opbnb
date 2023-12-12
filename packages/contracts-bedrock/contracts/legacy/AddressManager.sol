@@ -38,6 +38,7 @@ contract AddressManager is Ownable {
         addresses[nameHash] = _address;
 
         emit AddressSet(_name, _address, oldAddress);
+        emit AddressSet(_name, _address, oldAddress);
     }
 
     /**
