@@ -1,6 +1,8 @@
 package caching
 
-import lru "github.com/hashicorp/golang-lru"
+import (
+	lru "github.com/hashicorp/golang-lru"
+)
 
 type Metrics interface {
 	CacheAdd(label string, cacheSize int, evicted bool)
@@ -28,6 +30,14 @@ func (c *LRUCache) Add(key, value any) (evicted bool) {
 		c.m.CacheAdd(c.label, c.inner.Len(), evicted)
 	}
 	return evicted
+}
+
+func (c *LRUCache) Peek(key any) (value any, ok bool) {
+	value, ok = c.inner.Peek(key)
+	if c.m != nil {
+		c.m.CacheGet(c.label, ok)
+	}
+	return value, ok
 }
 
 // NewLRUCache creates a LRU cache with the given metrics, labeling the cache adds/gets.

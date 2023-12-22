@@ -365,7 +365,7 @@ func (s *EthClient) FetchReceipts(ctx context.Context, blockHash common.Hash) (e
 	// that if just one of many calls fail, we only retry the failed call rather than all of the calls.
 	// The underlying fetcher uses the receipts hash to verify receipt integrity.
 	var job *receiptsFetchingJob
-	if v, ok := s.receiptsCache.Get(blockHash); ok {
+	if v, ok := s.receiptsCache.Peek(blockHash); ok {
 		job = v.(*receiptsFetchingJob)
 	} else {
 		txHashes := eth.TransactionsToHashes(txs)
