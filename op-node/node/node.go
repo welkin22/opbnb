@@ -319,6 +319,7 @@ func (n *OpNode) OnNewL1Head(ctx context.Context, sig eth.L1BlockRef) {
 	if err := n.l2Driver.OnL1Head(ctx, sig); err != nil {
 		n.log.Warn("failed to notify engine driver of L1 head change", "err", err)
 	}
+	n.log.Debug("OnNewL1Head", "hash", sig.Hash, "number", sig.Number)
 }
 
 func (n *OpNode) OnNewL1Safe(ctx context.Context, sig eth.L1BlockRef) {

@@ -189,6 +189,7 @@ func (l *FallbackClient) switchCurrentRpcLogic() error {
 }
 
 func (l *FallbackClient) reSubscribeNewRpc(url string) error {
+	l.log.Debug("reSubscribeNewRpc", "url", url)
 	(*l.l1HeadsSub).Unsubscribe()
 	subscriptionNew, err := l.subscribeFunc()
 	if err != nil {
@@ -196,6 +197,7 @@ func (l *FallbackClient) reSubscribeNewRpc(url string) error {
 		return err
 	} else {
 		*l.l1HeadsSub = subscriptionNew
+		l.log.Debug("reSubscribeNewRpc success", "url", url)
 	}
 	return nil
 }

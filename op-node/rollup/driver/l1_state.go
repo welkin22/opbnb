@@ -30,6 +30,7 @@ func NewL1State(log log.Logger, metrics L1Metrics) *L1State {
 }
 
 func (s *L1State) HandleNewL1HeadBlock(head eth.L1BlockRef) {
+	s.log.Debug("HandleNewL1HeadBlock", "hash", head.Hash, "number", head.Number)
 	// We don't need to do anything if the head hasn't changed.
 	if s.l1Head == (eth.L1BlockRef{}) {
 		s.log.Info("Received first L1 head signal", "l1_head", head)

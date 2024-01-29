@@ -114,6 +114,7 @@ func (w *PollingClient) EthSubscribe(ctx context.Context, channel any, args ...a
 	w.subID++
 	w.subs[subID] = sub
 	w.mtx.Unlock()
+	w.lgr.Debug("new sub", "id", subID)
 
 	return event.NewSubscription(func(quit <-chan struct{}) error {
 		for {
@@ -123,9 +124,11 @@ func (w *PollingClient) EthSubscribe(ctx context.Context, channel any, args ...a
 			case <-quit:
 				w.mtx.Lock()
 				delete(w.subs, subID)
+				w.lgr.Debug("delete sub", "id", subID)
 				w.mtx.Unlock()
 				return nil
 			case <-w.ctx.Done():
+				w.lgr.Debug("polling done")
 				return nil
 			}
 		}
@@ -164,10 +167,11 @@ func (w *PollingClient) pollHeads() {
 				continue
 			}
 
-			w.lgr.Trace("notifying subscribers of new head", "head", head.Hash())
+			w.lgr.Trace("notifying subscribers of new head", "head", head.Hash(), "number", head.Number.Uint64())
 			w.currHead = head
 			w.mtx.RLock()
-			for _, sub := range w.subs {
+			for idx, sub := range w.subs {
+				w.lgr.Debug("subs head", "idx", idx, "hash", head.Hash(), "number", head.Number.Uint64())
 				sub <- head
 			}
 			w.mtx.RUnlock()
