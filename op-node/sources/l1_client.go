@@ -198,7 +198,7 @@ func (s *L1Client) GoOrUpdatePreFetchReceipts(ctx context.Context, l1Start uint6
 										time.Sleep(1 * time.Second)
 										continue
 									}
-									s.log.Debug("pre-fetching receipts done", "block", blockInfo.Number)
+									s.log.Debug("pre-fetching receipts done", "block", blockInfo.Number, "blockHash", blockInfo.Hash)
 									break
 								}
 							}
