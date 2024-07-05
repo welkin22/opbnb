@@ -156,6 +156,8 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/karalabe/usb v0.0.3-0.20230711191512-61db3e06439c // indirect
+	github.com/karlseguin/ccache v2.0.3+incompatible // indirect
+	github.com/kilic/bls12-381 v0.1.0 // indirect
 	github.com/klauspost/compress v1.17.2 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.6 // indirect
 	github.com/koron/go-ssdp v0.0.4 // indirect
@@ -203,6 +205,7 @@ require (
 	github.com/prometheus/client_model v0.5.0 // indirect
 	github.com/prometheus/common v0.48.0 // indirect
 	github.com/prometheus/procfs v0.12.0 // indirect
+	github.com/protolambda/bls12-381-util v0.0.0-20220416220906-d8552aa452c7 // indirect
 	github.com/prysmaticlabs/eth2-types v0.0.0-20210303084904-c9735a06829d // indirect
 	github.com/prysmaticlabs/fastssz v0.0.0-20221107182844-78142813af44 // indirect
 	github.com/prysmaticlabs/gohashtree v0.0.3-alpha // indirect
@@ -255,7 +258,11 @@ require (
 
 replace github.com/ethereum/go-ethereum v1.13.8 => github.com/bnb-chain/op-geth v0.4.1
 
-replace github.com/cometbft/cometbft => github.com/bnb-chain/greenfield-cometbft v1.0.0
+replace github.com/cometbft/cometbft => github.com/bnb-chain/greenfield-cometbft v1.0.1
+
+replace github.com/prysmaticlabs/prysm/v4 v4.2.0 => github.com/bnb-chain/prysm/v4 v4.2.1-0.20240704092443-da211b783b7f
+
+replace github.com/prysmaticlabs/prysm v0.0.0-20220124113610-e26cde5e091b => github.com/bnb-chain/prysm v1.4.2-0.20240704092449-3b0500f944a9
 
 // replace github.com/ethereum-optimism/superchain-registry/superchain => ../superchain-registry/superchain
 
